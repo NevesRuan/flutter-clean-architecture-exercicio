@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'presentation/pages/product_page.dart';
 import 'presentation/viewmodels/product_viewmodel.dart';
 import 'data/repositories/product_repository_impl.dart';
@@ -15,18 +16,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Product App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: ProductPage(
-        viewModel: ProductViewModel(
-          ProductRepositoryImpl(
-            ProductRemoteDatasource(Dio()),
-            ProductCacheDatasource(),
-          ),
+    return ChangeNotifierProvider(
+      create: (_) => ProductViewModel(
+        ProductRepositoryImpl(
+          ProductRemoteDatasource(Dio()),
+          ProductCacheDatasource(),
         ),
+      ),
+      child: MaterialApp(
+        title: 'Product App',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
+        home: const ProductPage(),
       ),
     );
   }

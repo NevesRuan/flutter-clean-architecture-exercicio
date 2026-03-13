@@ -1,19 +1,29 @@
 import 'package:flutter/foundation.dart';
-import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import 'product state.dart';
 
-class ProductViewModel {
+class ProductViewModel extends ChangeNotifier {
   final ProductRepository repository;
-  final ValueNotifier<ProductState> state = ValueNotifier(const ProductState());
+
+  ProductState _state = const ProductState();
+  ProductState get state => _state;
+
   ProductViewModel(this.repository);
+
   Future<void> loadProducts() async {
-    state.value = state.value.copyWith(isLoading: true);
+    _state = _state.copyWith(isLoading: true);
+    notifyListeners();
     try {
       final products = await repository.getProducts();
-      state.value = state.value.copyWith(isLoading: false, products: products);
+      _state = _state.copyWith(isLoading: false, products: products);
     } catch (e) {
-      state.value = state.value.copyWith(isLoading: false, error: e.toString());
+      _state = _state.copyWith(isLoading: false, error: e.toString());
     }
+    notifyListeners();
+  }
+
+  void toggleFavorite(int index) {
+    _state.products[index].favorite = !_state.products[index].favorite;
+    notifyListeners();
   }
 }
