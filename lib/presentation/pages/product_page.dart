@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/product_viewmodel.dart';
+import 'product_detail_page.dart';
 
 class ProductPage extends StatelessWidget {
   const ProductPage({super.key});
@@ -28,6 +29,14 @@ class ProductPage extends StatelessWidget {
                 leading: Image.network(product.image),
                 title: Text(product.title),
                 subtitle: Text("\$${product.price}"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductDetailPage(product: product),
+                    ),
+                  );
+                },
                 trailing: IconButton(
                   icon: Icon(
                     product.favorite ? Icons.star : Icons.star_border,

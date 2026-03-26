@@ -58,3 +58,39 @@ Questionário (Atividade 06)
 
     O mais chato foi acertar o uso do copyWith no estado para nao acabar apagando dados que ja existiam quando eu queria alterar so uma propriedade.
 
+---
+
+Questionário (Atividade 07)
+
+    1. Qual era a estrutura do seu projeto antes da inclusão das novas telas?
+
+    Antes havia apenas a ProductPage como tela principal, com o ProductViewModel e o ProductState, e os modelos/entidades sem description e category.
+
+    2. Como ficou o fluxo da aplicação após a implementação da navegação?
+
+    Agora o fluxo e HomePage -> ProductPage -> ProductDetailPage, com retorno usando o back para a tela anterior em cada etapa.
+
+    3. Qual é o papel do Navigator.push() no seu projeto?
+
+    Ele empilha uma nova rota na pilha de navegaçao, permitindo abrir a ProductPage e a ProductDetailPage.
+
+    4. Qual é o papel do Navigator.pop() no seu projeto?
+
+    Ele desempilha a rota atual e retorna para a tela anterior (voltar da ProductDetailPage para ProductPage e depois para HomePage).
+
+    5. Como os dados do produto selecionado foram enviados para a tela de detalhes?
+
+    Eu passei o objeto Product pelo construtor do ProductDetailPage, usando ProductDetailPage(product: product).
+
+    6. Por que a tela de detalhes depende das informações da tela anterior?
+
+    Porque a tela anterior ja tem o produto selecionado, assim os detalhes sao exibidos sem nova busca e mantendo o contexto do item escolhido.
+
+    7. Quais foram as principais mudanças feitas no projeto original?
+
+    Adicionei HomePage e ProductDetailPage, coloquei a HomePage como home, criei a navegaçao entre telas, e expandi os modelos/entidades para incluir description e category.
+
+    8. Quais dificuldades você encontrou durante a adaptação do projeto para múltiplas telas?
+
+    O principal foi lembrar de atualizar o mapeamento de dados e os imports das novas telas.
+
