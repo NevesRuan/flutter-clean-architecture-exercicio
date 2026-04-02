@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import 'product state.dart';
 
@@ -25,5 +26,20 @@ class ProductViewModel extends ChangeNotifier {
   void toggleFavorite(int index) {
     _state.products[index].favorite = !_state.products[index].favorite;
     notifyListeners();
+  }
+
+  Future<void> addProduct(Product product) async {
+    await repository.addProduct(product);
+    await loadProducts();
+  }
+
+  Future<void> updateProduct(Product product) async {
+    await repository.updateProduct(product);
+    await loadProducts();
+  }
+
+  Future<void> deleteProduct(int id) async {
+    await repository.deleteProduct(id);
+    await loadProducts();
   }
 }

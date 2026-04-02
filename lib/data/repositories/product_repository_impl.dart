@@ -1,5 +1,6 @@
 import '../datasources/product_remote_datasource.dart';
 import '../datasources/product_cache_datasource.dart';
+import '../models/product_model.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
 import '../../core/errors/failure.dart';
@@ -9,6 +10,15 @@ class ProductRepositoryImpl implements ProductRepository {
   final ProductCacheDatasource cache;
 
   ProductRepositoryImpl(this.remote, this.cache);
+
+  ProductModel _toModel(Product p) => ProductModel(
+        id: p.id,
+        title: p.title,
+        price: p.price,
+        image: p.image,
+        description: p.description,
+        category: p.category,
+      );
 
   @override
   Future<List<Product>> getProducts() async {
@@ -40,6 +50,33 @@ class ProductRepositoryImpl implements ProductRepository {
             .toList();
       }
       throw Failure("Não foi possível carregar os produtos");
+    }
+  }
+
+  @override
+  Future<void> addProduct(Product product) async {
+    try {
+      await remote.addProduct(_toModel(product));
+    } catch (e) {
+      throw Failure("Não foi possível adicionar o produto");
+    }
+  }
+
+  @override
+  Future<void> updateProduct(Product product) async {
+    try {
+      await remote.updateProduct(_toModel(product));
+    } catch (e) {
+      throw Failure("Não foi possível atualizar o produto");
+    }
+  }
+
+  @override
+  Future<void> deleteProduct(int id) async {
+    try {
+      await remote.deleteProduct(id);
+    } catch (e) {
+      throw Failure("Não foi possível remover o produto");
     }
   }
 }

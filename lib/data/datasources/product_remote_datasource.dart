@@ -15,4 +15,24 @@ class ProductRemoteDatasource {
             . map (( json ) => ProductModel . fromJson ( json ) )
             . toList () ;
     }
+
+    Future < ProductModel > addProduct ( ProductModel product ) async {
+        final response = await client . post (
+        'https://fakestoreapi.com/products' ,
+        data : product . toJson () ,
+        ) ;
+        return ProductModel . fromJson ( response . data ) ;
+    }
+
+    Future < ProductModel > updateProduct ( ProductModel product ) async {
+        final response = await client . put (
+        'https://fakestoreapi.com/products/${product.id}' ,
+        data : product . toJson () ,
+        ) ;
+        return ProductModel . fromJson ( response . data ) ;
+    }
+
+    Future < void > deleteProduct ( int id ) async {
+        await client . delete ( 'https://fakestoreapi.com/products/$id' ) ;
+    }
 }

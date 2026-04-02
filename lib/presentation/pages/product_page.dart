@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/product_viewmodel.dart';
 import 'product_detail_page.dart';
+import 'product_form_page.dart';
 
 class ProductPage extends StatelessWidget {
   const ProductPage({super.key});
@@ -37,22 +38,88 @@ class ProductPage extends StatelessWidget {
                     ),
                   );
                 },
-                trailing: IconButton(
-                  icon: Icon(
-                    product.favorite ? Icons.star : Icons.star_border,
-                    color: product.favorite ? Colors.amber : null,
-                  ),
-                  onPressed: () =>
-                      context.read<ProductViewModel>().toggleFavorite(index),
+                trailing: Wrap(
+                  spacing: 4,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        product.favorite ? Icons.star : Icons.star_border,
+                        color: product.favorite ? Colors.amber : null,
+                      ),
+                      onPressed: () =>
+                          context.read<ProductViewModel>().toggleFavorite(index),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ProductFormPage(product: product),
+                          ),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () async {
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Confirmar exclusao'),
+                            content: const Text(
+                                'Deseja realmente excluir este produto?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, false),
+                                child: const Text('Cancelar'),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(context, true),
+                                child: const Text('Excluir'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirmed == true) {
+                          await context
+                              .read<ProductViewModel>()
+                              .deleteProduct(product.id);
+                        }
+                      },
+                    ),
+                  ],
                 ),
               );
             },
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: viewModel.loadProducts,
-        child: const Icon(Icons.download),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            heroTag: 'downloadProducts',
+            onPressed: viewModel.loadProducts,
+            child: const Icon(Icons.download),
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton(
+            heroTag: 'addProduct',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProductFormPage(),
+                ),
+              );
+            },
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }
