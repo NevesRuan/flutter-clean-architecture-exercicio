@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/product_viewmodel.dart';
+import '../viewmodels/session_viewmodel.dart';
 import 'product_detail_page.dart';
 import 'product_form_page.dart';
+import 'profile_page.dart';
 
 class ProductPage extends StatelessWidget {
   const ProductPage({super.key});
@@ -11,9 +13,56 @@ class ProductPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<ProductViewModel>();
     final state = viewModel.state;
+    final session = context.watch<SessionViewModel>();
+    final user = session.user;
+    final firstName = user?.firstName ?? '';
+    final image = user?.image ?? '';
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Products")),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            if (user != null) ...[
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProfilePage(),
+                    ),
+                  );
+                },
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundImage:
+                      image.isNotEmpty ? NetworkImage(image) : null,
+                  child: image.isEmpty
+                      ? Text(
+                          firstName.isNotEmpty
+                              ? firstName[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(fontSize: 14),
+                        )
+                      : null,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(firstName),
+              const SizedBox(width: 8),
+              const Text('•'),
+              const SizedBox(width: 8),
+            ],
+            const Text('Products'),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sair',
+            onPressed: () => context.read<SessionViewModel>().signOut(),
+          ),
+        ],
+      ),
       body: Builder(
         builder: (_) {
           if (state.isLoading) {
@@ -27,14 +76,17 @@ class ProductPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final product = state.products[index];
               return ListTile(
-                leading: Image.network(product.image),
+                leading: Image.network(product.thumbnail),
                 title: Text(product.title),
-                subtitle: Text("\$${product.price}"),
+                subtitle: Text(
+                  '\$${product.price}  •  Estoque: ${product.stock}',
+                ),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProductDetailPage(product: product),
+                      builder: (context) =>
+                          ProductDetailPage(productId: product.id),
                     ),
                   );
                 },
@@ -64,6 +116,7 @@ class ProductPage extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () async {
+                        final productVm = context.read<ProductViewModel>();
                         final confirmed = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -85,9 +138,7 @@ class ProductPage extends StatelessWidget {
                           ),
                         );
                         if (confirmed == true) {
-                          await context
-                              .read<ProductViewModel>()
-                              .deleteProduct(product.id);
+                          await productVm.deleteProduct(product.id);
                         }
                       },
                     ),

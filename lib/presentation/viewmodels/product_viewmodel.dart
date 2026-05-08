@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/repositories/product_repository.dart';
-import 'product state.dart';
+import 'product_state.dart';
 
 class ProductViewModel extends ChangeNotifier {
   final ProductRepository repository;
@@ -41,5 +41,9 @@ class ProductViewModel extends ChangeNotifier {
   Future<void> deleteProduct(int id) async {
     await repository.deleteProduct(id);
     await loadProducts();
+  }
+
+  Future<Product> getProductById(int id) {
+    return repository.getProductById(id);
   }
 }

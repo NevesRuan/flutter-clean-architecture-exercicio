@@ -15,9 +15,22 @@ class ProductRepositoryImpl implements ProductRepository {
         id: p.id,
         title: p.title,
         price: p.price,
-        image: p.image,
+        thumbnail: p.thumbnail,
         description: p.description,
         category: p.category,
+        rating: p.rating,
+        stock: p.stock,
+      );
+
+  Product _toEntity(ProductModel m) => Product(
+        id: m.id,
+        title: m.title,
+        price: m.price,
+        thumbnail: m.thumbnail,
+        description: m.description,
+        category: m.category,
+        rating: m.rating,
+        stock: m.stock,
       );
 
   @override
@@ -25,31 +38,23 @@ class ProductRepositoryImpl implements ProductRepository {
     try {
       final models = await remote.getProducts();
       cache.save(models);
-      return models
-          .map((m) => Product(
-                id: m.id,
-                title: m.title,
-                price: m.price,
-                image: m.image,
-                description: m.description,
-                category: m.category,
-              ))
-          .toList();
+      return models.map(_toEntity).toList();
     } catch (e) {
       final cached = cache.get();
       if (cached != null) {
-        return cached
-            .map((m) => Product(
-                  id: m.id,
-                  title: m.title,
-                  price: m.price,
-                  image: m.image,
-                  description: m.description,
-                  category: m.category,
-                ))
-            .toList();
+        return cached.map(_toEntity).toList();
       }
-      throw Failure("Não foi possível carregar os produtos");
+      throw Failure('Não foi possível carregar os produtos');
+    }
+  }
+
+  @override
+  Future<Product> getProductById(int id) async {
+    try {
+      final model = await remote.getProductById(id);
+      return _toEntity(model);
+    } catch (e) {
+      throw Failure('Não foi possível carregar o produto');
     }
   }
 
@@ -58,7 +63,7 @@ class ProductRepositoryImpl implements ProductRepository {
     try {
       await remote.addProduct(_toModel(product));
     } catch (e) {
-      throw Failure("Não foi possível adicionar o produto");
+      throw Failure('Não foi possível adicionar o produto');
     }
   }
 
@@ -67,7 +72,7 @@ class ProductRepositoryImpl implements ProductRepository {
     try {
       await remote.updateProduct(_toModel(product));
     } catch (e) {
-      throw Failure("Não foi possível atualizar o produto");
+      throw Failure('Não foi possível atualizar o produto');
     }
   }
 
@@ -76,7 +81,7 @@ class ProductRepositoryImpl implements ProductRepository {
     try {
       await remote.deleteProduct(id);
     } catch (e) {
-      throw Failure("Não foi possível remover o produto");
+      throw Failure('Não foi possível remover o produto');
     }
   }
 }

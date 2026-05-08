@@ -17,7 +17,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
   late final TextEditingController _price;
   late final TextEditingController _description;
   late final TextEditingController _category;
-  late final TextEditingController _image;
+  late final TextEditingController _thumbnail;
+  late final TextEditingController _rating;
+  late final TextEditingController _stock;
 
   @override
   void initState() {
@@ -27,7 +29,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
     _price = TextEditingController(text: p?.price.toString() ?? '');
     _description = TextEditingController(text: p?.description ?? '');
     _category = TextEditingController(text: p?.category ?? '');
-    _image = TextEditingController(text: p?.image ?? '');
+    _thumbnail = TextEditingController(text: p?.thumbnail ?? '');
+    _rating = TextEditingController(text: p?.rating.toString() ?? '0');
+    _stock = TextEditingController(text: p?.stock.toString() ?? '0');
   }
 
   @override
@@ -36,8 +40,25 @@ class _ProductFormPageState extends State<ProductFormPage> {
     _price.dispose();
     _description.dispose();
     _category.dispose();
-    _image.dispose();
+    _thumbnail.dispose();
+    _rating.dispose();
+    _stock.dispose();
     super.dispose();
+  }
+
+  String? _requiredValidator(String? v) =>
+      (v == null || v.isEmpty) ? 'Campo obrigatorio' : null;
+
+  String? _doubleValidator(String? v) {
+    if (v == null || v.isEmpty) return 'Campo obrigatorio';
+    if (double.tryParse(v) == null) return 'Valor numérico inválido';
+    return null;
+  }
+
+  String? _intValidator(String? v) {
+    if (v == null || v.isEmpty) return 'Campo obrigatorio';
+    if (int.tryParse(v) == null) return 'Valor inteiro inválido';
+    return null;
   }
 
   Future<void> _save() async {
@@ -49,7 +70,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
       price: double.parse(_price.text),
       description: _description.text,
       category: _category.text,
-      image: _image.text,
+      thumbnail: _thumbnail.text,
+      rating: double.parse(_rating.text),
+      stock: int.parse(_stock.text),
     );
     if (widget.product == null) {
       await vm.addProduct(product);
@@ -76,33 +99,47 @@ class _ProductFormPageState extends State<ProductFormPage> {
               TextFormField(
                 controller: _title,
                 decoration: const InputDecoration(labelText: 'Titulo'),
-                validator: (v) => v!.isEmpty ? 'Campo obrigatorio' : null,
+                validator: _requiredValidator,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _price,
                 decoration: const InputDecoration(labelText: 'Preco'),
-                keyboardType: TextInputType.number,
-                validator: (v) => v!.isEmpty ? 'Campo obrigatorio' : null,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: _doubleValidator,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _description,
                 decoration: const InputDecoration(labelText: 'Descricao'),
                 maxLines: 3,
-                validator: (v) => v!.isEmpty ? 'Campo obrigatorio' : null,
+                validator: _requiredValidator,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _category,
                 decoration: const InputDecoration(labelText: 'Categoria'),
-                validator: (v) => v!.isEmpty ? 'Campo obrigatorio' : null,
+                validator: _requiredValidator,
               ),
               const SizedBox(height: 12),
               TextFormField(
-                controller: _image,
-                decoration: const InputDecoration(labelText: 'Imagem (URL)'),
-                validator: (v) => v!.isEmpty ? 'Campo obrigatorio' : null,
+                controller: _thumbnail,
+                decoration: const InputDecoration(labelText: 'Thumbnail (URL)'),
+                validator: _requiredValidator,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _rating,
+                decoration: const InputDecoration(labelText: 'Rating (0-5)'),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: _doubleValidator,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _stock,
+                decoration: const InputDecoration(labelText: 'Estoque'),
+                keyboardType: TextInputType.number,
+                validator: _intValidator,
               ),
               const SizedBox(height: 16),
               SizedBox(

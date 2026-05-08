@@ -2,37 +2,43 @@ import 'package:dio/dio.dart';
 import '../models/product_model.dart';
 
 class ProductRemoteDatasource {
-    final Dio client ;
+  static const _baseUrl = 'https://dummyjson.com/products';
 
-    ProductRemoteDatasource ( this . client ) ;
+  final Dio client;
 
-    Future < List < ProductModel > > getProducts () async {
-        final response = await client . get (
-        "https://fakestoreapi.com/products"
-        ) ;
-        final List data = response . data ;
-        return data
-            . map (( json ) => ProductModel . fromJson ( json ) )
-            . toList () ;
-    }
+  ProductRemoteDatasource(this.client);
 
-    Future < ProductModel > addProduct ( ProductModel product ) async {
-        final response = await client . post (
-        'https://fakestoreapi.com/products' ,
-        data : product . toJson () ,
-        ) ;
-        return ProductModel . fromJson ( response . data ) ;
-    }
+  Future<List<ProductModel>> getProducts() async {
+    final response = await client.get(_baseUrl);
+    final data = response.data as Map<String, dynamic>;
+    final List products = data['products'] as List? ?? [];
+    return products
+        .map((json) => ProductModel.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
 
-    Future < ProductModel > updateProduct ( ProductModel product ) async {
-        final response = await client . put (
-        'https://fakestoreapi.com/products/${product.id}' ,
-        data : product . toJson () ,
-        ) ;
-        return ProductModel . fromJson ( response . data ) ;
-    }
+  Future<ProductModel> getProductById(int id) async {
+    final response = await client.get('$_baseUrl/$id');
+    return ProductModel.fromJson(response.data as Map<String, dynamic>);
+  }
 
-    Future < void > deleteProduct ( int id ) async {
-        await client . delete ( 'https://fakestoreapi.com/products/$id' ) ;
-    }
+  Future<ProductModel> addProduct(ProductModel product) async {
+    final response = await client.post(
+      '$_baseUrl/add',
+      data: product.toJson(),
+    );
+    return ProductModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  Future<ProductModel> updateProduct(ProductModel product) async {
+    final response = await client.put(
+      '$_baseUrl/${product.id}',
+      data: product.toJson(),
+    );
+    return ProductModel.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  Future<void> deleteProduct(int id) async {
+    await client.delete('$_baseUrl/$id');
+  }
 }
